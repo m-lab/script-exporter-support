@@ -1,0 +1,9 @@
+[submodule "operator"]
+	path = operator
+	url = https://github.com/m-lab/operator
+[submodule "travis"]
+	path = travis
+	url = https://github.com/m-lab/travis
+[submodule "ndt"]
+	path = ndt
+	url = https://github.com/m-lab/ndt
