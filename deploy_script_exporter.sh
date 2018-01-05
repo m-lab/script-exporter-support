@@ -8,7 +8,7 @@ set -x
 USAGE="Usage: $0 <project> <keyname>"
 PROJECT=${1:?Please provide project name: $USAGE}
 KEYNAME=${2:?Please provide an authentication key name: $USAGE}
-SCP_FILES="apply_tc_rules.sh Dockerfile ndt_e2e.sh ndt_client.js operator script-exporter script-exporter.yml"
+SCP_FILES="apply_tc_rules.sh Dockerfile ndt_e2e.sh ndt_client.js operator script_exporter script-exporter.yml"
 IMAGE_TAG="m-lab/prometheus-script-exporter"
 GCE_ZONE="us-central1-a"
 GCE_NAME="script-exporter"

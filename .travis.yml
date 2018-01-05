@@ -4,10 +4,18 @@ go:
   - 1.8.1
 
 install:
-  - go get github.com/nkinkade/script_exporter
+  # TODO (kinkade): Fix this. If upstream accepts my PR, then this can be
+  # drastically simpler. If they don't accept it, then move this to an m-lab
+  # repo.
+  - SCRIPT_EXPORTER_URI=github.com/nkinkade/script_exporter
+    SCRIPT_EXPORTER_BRANCH=mlab
+    go get -d $SCRIPT_EXPORTER_URI
+    git -C $GOPATH/src/$SCRIPT_EXPORTER_URI
+    checkout origin/$SCRIPT_EXPORTER_BRANCH
+    go install $SCRIPT_EXPORTER_URI
 
 script:
-  - "cp $GOPATH/bin/script-exporter $TRAVIS_BUILD_DIR/"
+  - "cp $GOPATH/bin/script_exporter $TRAVIS_BUILD_DIR/"
   - "$TRAVIS_BUILD_DIR/travis/install_gcloud.sh"
 
 deploy:
