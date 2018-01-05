@@ -10,7 +10,7 @@ install:
   - SCRIPT_EXPORTER_URI=github.com/nkinkade/script_exporter;
     SCRIPT_EXPORTER_BRANCH=mlab;
     go get -d $SCRIPT_EXPORTER_URI;
-    git -C $GOPATH/src/$SCRIPT_EXPORTER_URI checkout origin/$SCRIPT_EXPORTER_BRANCH;
+    git -C $GOPATH/src/$SCRIPT_EXPORTER_URI checkout -b $SCRIPT_EXPORTER_BRANCH origin/$SCRIPT_EXPORTER_BRANCH;
     go install $SCRIPT_EXPORTER_URI
 
 script:
