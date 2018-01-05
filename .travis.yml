@@ -4,14 +4,8 @@ go:
   - 1.8.1
 
 install:
-  # TODO (kinkade): Fix this. If upstream accepts my PR, then this can be
-  # drastically simpler. If they don't accept it, then move this to an m-lab
-  # repo.
-  - SCRIPT_EXPORTER_URI=github.com/nkinkade/script_exporter;
-    SCRIPT_EXPORTER_BRANCH=mlab;
-    go get -d $SCRIPT_EXPORTER_URI;
-    git -C $GOPATH/src/$SCRIPT_EXPORTER_URI checkout -b $SCRIPT_EXPORTER_BRANCH origin/$SCRIPT_EXPORTER_BRANCH;
-    go install $SCRIPT_EXPORTER_URI
+  # TODO (kinkade): If upstream accepts my PR, then change the URI.
+  -  go get github.com/nkinkade/script_exporter
 
 script:
   - "cp $GOPATH/bin/script_exporter $TRAVIS_BUILD_DIR/"
