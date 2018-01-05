@@ -11,7 +11,7 @@ install:
     SCRIPT_EXPORTER_BRANCH=mlab;
     go get -d $SCRIPT_EXPORTER_URI;
     git -C $GOPATH/src/$SCRIPT_EXPORTER_URI;
-    checkout origin/$SCRIPT_EXPORTER_BRANCH;
+    git checkout origin/$SCRIPT_EXPORTER_BRANCH;
     go install $SCRIPT_EXPORTER_URI
 
 script:
