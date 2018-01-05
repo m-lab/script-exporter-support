@@ -7,11 +7,11 @@ install:
   # TODO (kinkade): Fix this. If upstream accepts my PR, then this can be
   # drastically simpler. If they don't accept it, then move this to an m-lab
   # repo.
-  - SCRIPT_EXPORTER_URI=github.com/nkinkade/script_exporter
-    SCRIPT_EXPORTER_BRANCH=mlab
-    go get -d $SCRIPT_EXPORTER_URI
-    git -C $GOPATH/src/$SCRIPT_EXPORTER_URI
-    checkout origin/$SCRIPT_EXPORTER_BRANCH
+  - SCRIPT_EXPORTER_URI=github.com/nkinkade/script_exporter;
+    SCRIPT_EXPORTER_BRANCH=mlab;
+    go get -d $SCRIPT_EXPORTER_URI;
+    git -C $GOPATH/src/$SCRIPT_EXPORTER_URI;
+    checkout origin/$SCRIPT_EXPORTER_BRANCH;
     go install $SCRIPT_EXPORTER_URI
 
 script:
