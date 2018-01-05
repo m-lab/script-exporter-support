@@ -1,0 +1,38 @@
+language: go
+
+go:
+  - 1.8.1
+
+install:
+  - go get github.com/nkinkade/script_exporter
+
+script:
+  - "cp $GOPATH/bin/script-exporter $TRAVIS_BUILD_DIR/"
+  - "$TRAVIS_BUILD_DIR/travis/install_gcloud.sh"
+
+deploy:
+  # Sandbox - conditionally deploy to GCP project mlab-sandbox
+  - provider: script
+    script: "$TRAVIS_BUILD_DIR/deploy_script_exporter.sh mlab-sandbox SERVICE_ACCOUNT_mlab_sandbox"
+    skip_cleanup: true
+    on:
+      repo: m-lab/prometheus-script-exporter
+      branch: sandbox-*
+      condition: "$TRAVIS_EVENT_TYPE == push"
+
+  # Staging - conditionally deploy to GCP project mlab-staging
+  - provider: script
+    script: "$TRAVIS_BUILD_DIR/deploy_script_exporter.sh mlab-staging SERVICE_ACCOUNT_mlab_staging"
+    skip_cleanup: true
+    on:
+      repo: m-lab/prometheus-script-exporter
+      branch: master
+      condition: "$TRAVIS_EVENT_TYPE == push"
+
+  # Production - conditionally deploy to GCP project mlab-oti
+  - provider: script
+    script: "$TRAVIS_BUILD_DIR/deploy_script_exporter.sh mlab-oti SERVICE_ACCOUNT_mlab_oti"
+    skip_cleanup: true
+    on:
+      repo: m-lab/prometheus-script-exporter
+      tags: true

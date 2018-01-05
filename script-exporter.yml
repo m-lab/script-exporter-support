@@ -1,0 +1,7 @@
+scripts:
+  - name: 'ping'
+    script: ping -c 1 ${TARGET}
+
+  - name: 'ndt-e2e'
+    script: ndt_e2e.sh ${TARGET}
+    timeout: 45
