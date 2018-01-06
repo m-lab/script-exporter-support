@@ -27,7 +27,7 @@ gcloud config set project $PROJECT
 gcloud config set compute/zone $GCE_ZONE
 
 # Authenticate the service account using KEYNAME.
-authenticate_service_account "${KEYNAME}"
+activate_service_account "${KEYNAME}"
 
 # Make sure that the files we want to copy actually exist.
 for scp_file in ${SCP_FILES}; do
