@@ -8,7 +8,7 @@ set -x
 USAGE="Usage: $0 <project> <keyname>"
 PROJECT=${1:?Please provide project name: $USAGE}
 KEYNAME=${2:?Please provide an authentication key name: $USAGE}
-SCP_FILES="apply_tc_rules.sh Dockerfile ndt_e2e.sh ndt/src/node_tests/ndt_client.js operator script_exporter script-exporter.yml"
+SCP_FILES="apply_tc_rules.sh Dockerfile ndt_e2e.sh script_exporter script-exporter.yml"
 IMAGE_TAG="m-lab/prometheus-script-exporter"
 GCE_ZONE="us-central1-a"
 GCE_NAME="script-exporter"
@@ -54,6 +54,10 @@ gcloud compute instances create $GCE_NAME --address $GCE_IP_NAME \
 
 # Copy required snmp_exporter files to the GCE instance.
 gcloud compute scp $SCP_FILES $GCE_NAME:~
+
+# Apply the traffic shaping rules (via tc) on the instance
+gcloud compute ssh $GCE_NAME --command "git clone https://github.com/m-lab/operator"
+gcloud compute ssh $GCE_NAME --command "git clone https://github.com/m-lab/ndt"
 
 # Apply the traffic shaping rules (via tc) on the instance
 gcloud compute ssh $GCE_NAME --command "bash apply_tc_rules.sh"
