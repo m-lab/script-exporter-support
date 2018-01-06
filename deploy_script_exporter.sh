@@ -31,8 +31,8 @@ activate_service_account "${KEYNAME}"
 
 # Make sure that the files we want to copy actually exist.
 for scp_file in ${SCP_FILES}; do
-  if [[ ! -f "${TRAVIS_BUILD_DIR}/${scp_file}" ]]; then
-    echo "Missing required file: ${TRAVIS_BUILD_DIR}/${scp_file}!"
+  if [[ ! -e "${TRAVIS_BUILD_DIR}/${scp_file}" ]]; then
+    echo "Missing required file/dir: ${TRAVIS_BUILD_DIR}/${scp_file}!"
     exit 1
   fi
 done
