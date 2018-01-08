@@ -28,7 +28,7 @@ tc class add dev eth0 parent 1: classid 1:1 htb rate 1000mbit
 tc class add dev eth0 parent 1: classid 1:10 htb rate 5mbit
 	
 # Extract NDT sliver IPs from mlabconfig.py output
-NDT_IPS=$($MLABCONFIG --format=hostips | egrep '^ndt\.iupui')
+NDT_IPS=$(python $MLABCONFIG --format=hostips | egrep '^ndt\.iupui')
 
 #
 # Configure filters
