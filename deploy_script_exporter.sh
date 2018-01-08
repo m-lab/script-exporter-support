@@ -50,7 +50,8 @@ fi
 # Create the new GCE instance. NOTE: $GCE_IP_NAME *must* refer to an existing
 # static external IP address for the project.
 gcloud compute instances create $GCE_NAME --address $GCE_IP_NAME \
-  --image-project $GCE_IMG_PROJECT --image-family $GCE_IMG_FAMILY
+  --image-project $GCE_IMG_PROJECT --image-family $GCE_IMG_FAMILY \
+  --metadata-from-file startup-script=apply_tc_rules.sh
 
 # Copy required snmp_exporter files to the GCE instance.
 gcloud compute scp $SCP_FILES $GCE_NAME:~
@@ -58,9 +59,6 @@ gcloud compute scp $SCP_FILES $GCE_NAME:~
 # Apply the traffic shaping rules (via tc) on the instance
 gcloud compute ssh $GCE_NAME --command "git clone https://github.com/m-lab/operator"
 gcloud compute ssh $GCE_NAME --command "git clone https://github.com/m-lab/ndt"
-
-# Apply the traffic shaping rules (via tc) on the instance
-gcloud compute ssh $GCE_NAME --command "sudo /home/travis/apply_tc_rules.sh"
 
 # Build the snmp_exporter Docker container.
 gcloud compute ssh $GCE_NAME --command "docker build -t ${IMAGE_TAG} ."
