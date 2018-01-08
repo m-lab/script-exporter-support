@@ -60,7 +60,7 @@ gcloud compute ssh $GCE_NAME --command "git clone https://github.com/m-lab/opera
 gcloud compute ssh $GCE_NAME --command "git clone https://github.com/m-lab/ndt"
 
 # Apply the traffic shaping rules (via tc) on the instance
-gcloud compute ssh $GCE_NAME --command "bash apply_tc_rules.sh"
+gcloud compute ssh $GCE_NAME --command "sudo apply_tc_rules.sh"
 
 # Build the snmp_exporter Docker container.
 gcloud compute ssh $GCE_NAME --command "docker build -t ${IMAGE_TAG} ."
