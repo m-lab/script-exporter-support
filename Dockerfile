@@ -1,7 +1,9 @@
-FROM alpine:3.7
+FROM debian:stretch-slim
 
-RUN apk add --update nodejs nodejs-npm go
-RUN npm init --yes
+RUN apt-get update
+RUN apt-get install sudo curl gnupg git iproute2
+RUN curl -sL https://deb.nodesource.com/setup_9.x | sudo -E bash -
+RUN apt-get install nodejs
 RUN npm install minimist ws
 
 COPY ndt/src/node_tests/ndt_client.js /bin/ndt_client.js
