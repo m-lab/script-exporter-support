@@ -6,8 +6,7 @@ STATE_WARNING=1
 STATE_CRITICAL=2
 STATE_UNKNOWN=3
 
-NDT_JS=ndt/src/node_tests/ndt_client.js
-NODE_PATH=$NODE_PATH:/opt/mlab/nagios-plugins/node_modules
+NDT_JS=/opt/mlab/ndt/src/node_tests/ndt_client.js
 
 if [ -n "$1" ]; then
     HOST=$1

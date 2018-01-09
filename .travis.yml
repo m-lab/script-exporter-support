@@ -1,14 +1,6 @@
-language: go
-
-go:
-  - 1.9
-
-install:
-  # TODO (kinkade): If upstream accepts my PR, then change the URI.
-  -  go get github.com/nkinkade/script_exporter
+language: generic
 
 script:
-  - "cp $GOPATH/bin/script_exporter $TRAVIS_BUILD_DIR/"
   - "$TRAVIS_BUILD_DIR/travis/install_gcloud.sh"
 
 deploy:

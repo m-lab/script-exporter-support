@@ -1,6 +1,6 @@
 #!/bin/bash
 
-MLABCONFIG=~/operator/plsync/mlabconfig.py
+MLABCONFIG=/opt/operator/plsync/mlabconfig.py
 
 if [ ! -x "$MLABCONFIG" ]; then
     echo "Could not find mlabconfig.py or is it not executable. Exiting."
