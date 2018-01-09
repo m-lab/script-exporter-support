@@ -50,7 +50,8 @@ fi
 # Create the new GCE instance. NOTE: $GCE_IP_NAME *must* refer to an existing
 # static external IP address for the project.
 gcloud compute instances create $GCE_NAME --address $GCE_IP_NAME \
-  --image-project $GCE_IMG_PROJECT --image-family $GCE_IMG_FAMILY
+  --image-project $GCE_IMG_PROJECT --image-family $GCE_IMG_FAMILY \
+  --tags script-exporter
 
 # Copy required snmp_exporter files to the GCE instance.
 gcloud compute scp $SCP_FILES $GCE_NAME:~
