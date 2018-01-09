@@ -1,10 +1,10 @@
 FROM debian:stretch
 
 # Install necessary packages
-RUN apt-get update --quiet
-RUN apt-get install --yes --quiet curl git gnupg golang iproute2 sudo 
+RUN apt-get update --quiet=2
+RUN apt-get install --yes --quiet=2 curl git gnupg golang iproute2 sudo 
 RUN curl -sL https://deb.nodesource.com/setup_9.x | sudo -E bash -
-RUN apt-get install --yes --quiet nodejs
+RUN apt-get install --yes --quiet=2 nodejs
 RUN npm install --global --quiet minimist ws
 
 # Clone necessary git repos
