@@ -16,7 +16,7 @@ COPY ndt_e2e.sh /bin/ndt_e2e.sh
 COPY script_exporter.yml /etc/script_exporter/config.yml
 
 # Apply traffic shaping rules
-RUN bash -c /bin/apply_tc_rules.sh
+RUN /bin/apply_tc_rules.sh
 
 EXPOSE 9172
 ENTRYPOINT [ "/root/go/bin/script_exporter" ]
