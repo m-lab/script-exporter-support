@@ -55,10 +55,6 @@ gcloud compute instances create $GCE_NAME --address $GCE_IP_NAME \
 # Copy required snmp_exporter files to the GCE instance.
 gcloud compute scp $SCP_FILES $GCE_NAME:~
 
-# Apply the traffic shaping rules (via tc) on the instance
-gcloud compute ssh $GCE_NAME --command "git clone https://github.com/m-lab/operator"
-gcloud compute ssh $GCE_NAME --command "git clone https://github.com/m-lab/ndt"
-
 # Build the snmp_exporter Docker container.
 gcloud compute ssh $GCE_NAME --command "docker build -t ${IMAGE_TAG} ."
 

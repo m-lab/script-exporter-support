@@ -2,9 +2,9 @@ FROM debian:stretch-slim
 
 # Install necessary packages
 RUN apt-get update
-RUN apt-get install sudo curl gnupg git iproute2
+RUN apt-get install --yes sudo curl gnupg git iproute2
 RUN curl -sL https://deb.nodesource.com/setup_9.x | sudo -E bash -
-RUN apt-get install nodejs
+RUN apt-get install --yes nodejs
 RUN npm install minimist ws
 
 # Clone necessary git repos
