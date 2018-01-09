@@ -1,11 +1,11 @@
 FROM debian:stretch-slim
 
 # Install necessary packages
-RUN apt-get update
-RUN apt-get install --yes curl git gnupg golang iproute2 sudo 
+RUN apt-get update --quiet
+RUN apt-get install --yes --quiet curl git gnupg golang iproute2 sudo 
 RUN curl -sL https://deb.nodesource.com/setup_9.x | sudo -E bash -
-RUN apt-get install --yes nodejs
-RUN npm install minimist ws
+RUN apt-get install --yes --quiet nodejs
+RUN npm install --global --quiet minimist ws
 
 # Clone necessary git repos
 RUN git clone https://github.com/m-lab/operator.git /opt/mlab/operator
@@ -15,9 +15,5 @@ COPY apply_tc_rules.sh /bin/apply_tc_rules.sh
 COPY ndt_e2e.sh /bin/ndt_e2e.sh
 COPY script_exporter.yml /etc/script_exporter/config.yml
 
-# Apply traffic shaping rules
-RUN /bin/apply_tc_rules.sh
-
 EXPOSE 9172
-ENTRYPOINT [ "/root/go/bin/script_exporter" ]
-CMD [ "-config.file=/etc/script_exporter/config.yml" ]
+ENTRYPOINT /bin/apply_tc_rules.sh && /root/go/bin/script_exporter -config.file=/etc/script_exporter/config.yml
