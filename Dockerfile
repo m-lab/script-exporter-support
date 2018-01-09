@@ -6,7 +6,7 @@ RUN npm install minimist ws
 
 COPY ndt/src/node_tests/ndt_client.js /bin/ndt_client.js
 COPY ndt_e2e.sh /bin/ndt_e2e.sh
-COPY script-exporter /bin/script_exporter
+COPY script_exporter /bin/script_exporter
 COPY script-exporter.yml /etc/script-exporter/config.yml
 
 EXPOSE 9172
