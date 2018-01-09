@@ -50,8 +50,7 @@ fi
 # Create the new GCE instance. NOTE: $GCE_IP_NAME *must* refer to an existing
 # static external IP address for the project.
 gcloud compute instances create $GCE_NAME --address $GCE_IP_NAME \
-  --image-project $GCE_IMG_PROJECT --image-family $GCE_IMG_FAMILY \
-  --metadata-from-file startup-script=apply_tc_rules.sh
+  --image-project $GCE_IMG_PROJECT --image-family $GCE_IMG_FAMILY
 
 # Copy required snmp_exporter files to the GCE instance.
 gcloud compute scp $SCP_FILES $GCE_NAME:~
@@ -61,7 +60,7 @@ gcloud compute ssh $GCE_NAME --command "git clone https://github.com/m-lab/opera
 gcloud compute ssh $GCE_NAME --command "git clone https://github.com/m-lab/ndt"
 
 # Build the snmp_exporter Docker container.
-gcloud compute ssh $GCE_NAME --command "docker build -t ${IMAGE_TAG} ."
+gcloud compute ssh $GCE_NAME --command "docker build --cap-add NET_ADMIN -t ${IMAGE_TAG} ."
 
 # Start a new container based on the new/updated image
 gcloud compute ssh $GCE_NAME --command "docker run -p 9172:9172 -d ${IMAGE_TAG}"
