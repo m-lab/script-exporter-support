@@ -1,4 +1,4 @@
-FROM debian:stretch-slim
+FROM debian:stretch
 
 # Install necessary packages
 RUN apt-get update --quiet
