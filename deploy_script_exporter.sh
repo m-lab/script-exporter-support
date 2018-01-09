@@ -60,7 +60,7 @@ gcloud compute ssh $GCE_NAME --command "git clone https://github.com/m-lab/opera
 gcloud compute ssh $GCE_NAME --command "git clone https://github.com/m-lab/ndt"
 
 # Build the snmp_exporter Docker container.
-gcloud compute ssh $GCE_NAME --command "docker build --cap-add NET_ADMIN -t ${IMAGE_TAG} ."
+gcloud compute ssh $GCE_NAME --command "docker build -t ${IMAGE_TAG} ."
 
 # Start a new container based on the new/updated image
-gcloud compute ssh $GCE_NAME --command "docker run -p 9172:9172 -d ${IMAGE_TAG}"
+gcloud compute ssh $GCE_NAME --command "docker run --cap-add NET_ADMIN -p 9172:9172 -d ${IMAGE_TAG}"
