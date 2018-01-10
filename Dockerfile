@@ -12,7 +12,7 @@ RUN git clone https://github.com/m-lab/operator.git /opt/mlab/operator
 RUN git clone https://github.com/m-lab/ndt.git /opt/mlab/ndt
 
 # Fetch and build script_exporter
-RUN go get github.com/nkinkade/script_exporter
+RUN GOPATH=/root/go go get github.com/nkinkade/script_exporter
 
 # Copy scripts and configs
 COPY apply_tc_rules.sh /bin/apply_tc_rules.sh
