@@ -1,3 +1,5 @@
+#cloud-config
+
 storage:
   files:
     - path: /etc/ssh/sshd_config
