@@ -13,8 +13,8 @@ IMAGE_TAG="m-lab/prometheus-script-exporter"
 GCE_ZONE="us-central1-a"
 GCE_NAME="script-exporter"
 GCE_IP_NAME="script-exporter-public-ip"
-GCE_IMG_PROJECT="cos-cloud"
-GCE_IMG_FAMILY="cos-stable"
+GCE_IMG_PROJECT="coreos-cloud"
+GCE_IMG_FAMILY="coreos-stable"
 
 # Add gcloud to PATH.
 source "${HOME}/google-cloud-sdk/path.bash.inc"
