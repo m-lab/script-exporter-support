@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# Globally installed Node.js modules are here
+export NODE_PATH=/usr/lib/node_modules
+
 # Return codes
 STATE_OK=0
 STATE_WARNING=1
