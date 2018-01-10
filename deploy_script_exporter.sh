@@ -53,6 +53,10 @@ gcloud compute instances create $GCE_NAME --address $GCE_IP_NAME \
   --image-project $GCE_IMG_PROJECT --image-family $GCE_IMG_FAMILY \
   --tags script-exporter --metadata-from-file user-data=cloud-config.yml
 
+# Give the GCE instance another 30s to fully become available. From time to time
+# the Travis-CI build fails because it can't connect via SSH.
+sleep 30
+
 # Copy required snmp_exporter files to the GCE instance.
 gcloud compute scp $SCP_FILES $GCE_NAME:~
 
