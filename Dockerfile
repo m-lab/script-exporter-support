@@ -3,13 +3,13 @@ FROM debian:stretch-slim
 # Install necessary packages
 RUN apt-get update -qq
 RUN apt-get install -qq curl dnsutils git gnupg golang iproute2 sudo 
-RUN npm install --global --quiet minimist ws
 
-# Setup and install Node.js and npm
+# Setup and install Node.js, npm and required modules
 RUN curl -s https://deb.nodesource.com/gpgkey/nodesource.gpg.key | apt-key add -
 RUN echo "deb https://deb.nodesource.com/node_9.x stretch main" > /etc/apt/sources.list.d/nodesource.list
 RUN apt-get update -qq
 RUN apt-get install -qq nodejs
+RUN npm install --global --quiet minimist ws
 
 # Clone necessary git repos
 RUN git clone https://github.com/m-lab/operator.git /opt/mlab/operator
