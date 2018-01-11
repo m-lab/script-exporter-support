@@ -6,9 +6,9 @@ RUN apt-get install -qq apt-transport-https curl dnsutils git gnupg golang iprou
 
 # Setup Node.js repository, install nodejs, and any needed modules
 RUN curl -s https://deb.nodesource.com/gpgkey/nodesource.gpg.key | apt-key add -
-RUN echo "deb https://deb.nodesource.com/node_9.x stretch main" > /etc/apt/sources.list.d/nodesource.list
+RUN echo "deb https://deb.nodesource.com/node_0.12 jessie main" > /etc/apt/sources.list.d/nodesource.list
 RUN apt-get update -qq
-RUN apt-get install -qq nodejs
+RUN apt-get install -qq nodejs=0.12.18-1nodesource1~jessie1
 RUN npm install --global --quiet minimist ws
 
 # Clone necessary git repos
