@@ -9,7 +9,7 @@ RUN curl -s https://deb.nodesource.com/gpgkey/nodesource.gpg.key | apt-key add -
 RUN echo "deb https://deb.nodesource.com/node_0.12 jessie main" > /etc/apt/sources.list.d/nodesource.list
 RUN apt-get update -qq
 RUN apt-get install -qq nodejs=0.12.18-1nodesource1~jessie1
-RUN npm install --global --quiet minimist ws
+RUN npm install --global --quiet minimist@1.2.0 ws@1.0.1
 
 # Clone necessary git repos
 RUN git clone https://github.com/m-lab/operator.git /opt/mlab/operator
