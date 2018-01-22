@@ -1,7 +1,11 @@
 scripts:
-  - name: 'ping'
-    script: ping -c 1 ${TARGET}
-
   - name: 'ndt_e2e'
     script: ndt_e2e.sh ${TARGET}
     timeout: 45
+
+  - name: 'ndt_queue'
+    script: >
+      NODE_PATH=/usr/lib/node_modules
+      nodejs /opt/mlab/ndt/src/node_tests/ndt_client.js --queueingtest
+      --server ${TARGET}
+    timeout: 15
