@@ -15,6 +15,7 @@ GCE_NAME="script-exporter"
 GCE_IP_NAME="script-exporter-public-ip"
 GCE_IMG_PROJECT="coreos-cloud"
 GCE_IMG_FAMILY="coreos-stable"
+MACHINE_TYPE="n1-standard-2"
 
 # Add gcloud to PATH.
 source "${HOME}/google-cloud-sdk/path.bash.inc"
@@ -51,7 +52,8 @@ fi
 # static external IP address for the project.
 gcloud compute instances create $GCE_NAME --address $GCE_IP_NAME \
   --image-project $GCE_IMG_PROJECT --image-family $GCE_IMG_FAMILY \
-  --tags script-exporter --metadata-from-file user-data=cloud-config.yml
+  --tags script-exporter --metadata-from-file user-data=cloud-config.yml \
+  --machine-type $MACHINE_TYPE
 
 # Give the GCE instance another 30s to fully become available. From time to time
 # the Travis-CI build fails because it can't connect via SSH.
