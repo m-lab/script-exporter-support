@@ -16,6 +16,26 @@ GCE_IP_NAME="script-exporter-public-ip"
 GCE_IMG_PROJECT="coreos-cloud"
 GCE_IMG_FAMILY="coreos-stable"
 
+# The script_exporter targets for each project only include the nodes specific
+# to that project. That is, the mlab-sandbox project will only have targets for
+# testing nodes, which is a small number. And the mlab-staging project will
+# only have targets for mlab4 nodes, which is more nodes than the mlab-sandbox
+# project. The mlab-oti project will have significantly more targets, all
+# mlab[1-3]s, than the other projects. Because of this, the demands on CPU and
+# memory will vary. This case statement allows us to set per project GCE
+# instance machine types to account for expected load.
+case $PROJECT in
+  mlab-oti)
+    MACHINE_TYPE="n1-standard-2"
+    ;;
+  mlab-staging)
+    MACHINE_TYPE="n1-standard-2"
+    ;;
+  *)
+    MACHINE_TYPE="n1-standard-1"
+    ;;
+esac
+
 # Add gcloud to PATH.
 source "${HOME}/google-cloud-sdk/path.bash.inc"
 
@@ -51,7 +71,8 @@ fi
 # static external IP address for the project.
 gcloud compute instances create $GCE_NAME --address $GCE_IP_NAME \
   --image-project $GCE_IMG_PROJECT --image-family $GCE_IMG_FAMILY \
-  --tags script-exporter --metadata-from-file user-data=cloud-config.yml
+  --tags script-exporter --metadata-from-file user-data=cloud-config.yml \
+  --machine-type $MACHINE_TYPE
 
 # Give the GCE instance another 30s to fully become available. From time to time
 # the Travis-CI build fails because it can't connect via SSH.
