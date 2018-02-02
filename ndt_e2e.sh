@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-set -e
 set -u
 
 # Globally installed Node.js modules are here
