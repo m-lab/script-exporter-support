@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+set -e
+set -u
+
 # Globally installed Node.js modules are here
 export NODE_PATH=/usr/lib/node_modules
 
@@ -34,7 +37,7 @@ CACHE_STATUS=$(cat $CACHDIR/$HOST 2> /dev/null)
 
 # If the cached status for this $HOST is a successful result and the mtime of
 # the cache file is less than $MAX_CACHE_AGE, then return $STATE_OK.
-if [[ "$CACHE_STATUS" -eq "$STATE_OK" ]]; then
+if [[ -n "$CACHE_STATUS" ]] && [[ "$CACHE_STATUS" -eq "$STATE_OK" ]]; then
     file_age=$(expr $(date +%s) - $(stat --printf "%Y" $CACHE_DIR/$HOST))
     if [[ "$file_age" -lt $MAX_CACHE_AGE ]]; then
         exit $STATE_OK
@@ -54,7 +57,7 @@ fi
 STATUS=$(nodejs $NDT_JS --quiet --queueingtest --server $HOST)
 
 # If the server isn't queueing, then run the e2e test.
-if [[ "$QUEUE_STATUS" -ne "$STATE_QUEUEING" ]]; then
+if [[ "$STATUS" -ne "$STATE_QUEUEING" ]]; then
     OUTPUT=$(nodejs $NDT_JS --quiet --server $HOST)
     STATUS=$?
 fi
