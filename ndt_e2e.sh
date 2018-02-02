@@ -15,6 +15,7 @@ STATE_OK=0
 STATE_WARNING=1
 STATE_CRITICAL=2
 STATE_UNKNOWN=3
+STATE_QUEUEING=5
 
 NDT_JS=/opt/mlab/ndt/src/node_tests/ndt_client.js
 
@@ -49,8 +50,14 @@ if ! /sbin/tc filter show dev eth0 | grep -q $HEX_IP; then
     exit $STATE_UNKNOWN
 fi
 
-OUTPUT=$(nodejs $NDT_JS --quiet --server $HOST)
-STATUS=$?
+# Do a queueing check first.
+STATUS=$(nodejs $NDT_JS --quiet --queueingtest --server $HOST)
+
+# If the server isn't queueing, then run the e2e test.
+if [[ "$QUEUE_STATUS" -ne "$STATE_QUEUEING" ]]; then
+    OUTPUT=$(nodejs $NDT_JS --quiet --server $HOST)
+    STATUS=$?
+fi
 
 echo $STATUS > $CACHE_DIR/$HOST
 
