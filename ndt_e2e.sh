@@ -33,7 +33,7 @@ if [[ ! -d $CACHE_DIR ]]; then
     mkdir $CACHE_DIR
 fi
 
-CACHE_STATUS=$(cat $CACHDIR/$HOST 2> /dev/null)
+CACHE_STATUS=$(cat $CACHE_DIR/$HOST 2> /dev/null)
 
 # If the cached status for this $HOST is a successful result and the mtime of
 # the cache file is less than $MAX_CACHE_AGE, then return $STATE_OK.
