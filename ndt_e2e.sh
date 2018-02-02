@@ -29,12 +29,14 @@ if [[ ! -d $CACHE_DIR ]]; then
     mkdir $CACHE_DIR
 fi
 
-# If the cache file exists and the current time less its mtime is younger than
-# $MAX_CACHE_AGE, then return that value and exit.
-if [[ -f $CACHE_DIR/$HOST ]]; then
+CACHE_STATUS=$(cat $CACHDIR/$HOST 2> /dev/null)
+
+# If the cached status for this $HOST is a successful result and the mtime of
+# the cache file is less than $MAX_CACHE_AGE, then return $STATE_OK.
+if [[ "$CACHE_STATUS" -eq "$STATE_OK" ]]; then
     file_age=$(expr $(date +%s) - $(stat --printf "%Y" $CACHE_DIR/$HOST))
     if [[ "$file_age" -lt $MAX_CACHE_AGE ]]; then
-        exit $(cat $CACHE_DIR/$HOST)
+        exit $STATE_OK
     fi
 fi
 
