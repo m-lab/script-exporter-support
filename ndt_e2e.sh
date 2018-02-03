@@ -53,7 +53,8 @@ if ! /sbin/tc filter show dev eth0 | grep -q $HEX_IP; then
 fi
 
 # Do a queueing check first.
-STATUS=$(nodejs $NDT_JS --quiet --queueingtest --server $HOST)
+OUTPUT=$(nodejs $NDT_JS --quiet --queueingtest --server $HOST)
+STATUS=$?
 
 # If the server isn't queueing, then run the e2e test.
 if [[ "$STATUS" -ne "$STATE_QUEUEING" ]]; then
