@@ -1,21 +1,46 @@
 #!/usr/bin/env bash
 
+set -u
+
 # Globally installed Node.js modules are here
 export NODE_PATH=/usr/lib/node_modules
+
+# Where to store cached NDT e2e test results
+CACHE_DIR=/tmp/ndt-e2e-cache
+
+# Max age (in seconds) to use a cached e2e test result before running the test
+# again to refresh the cached value.
+MAX_CACHE_AGE="600"
 
 # Return codes
 STATE_OK=0
 STATE_WARNING=1
 STATE_CRITICAL=2
 STATE_UNKNOWN=3
+STATE_QUEUEING=5
 
 NDT_JS=/opt/mlab/ndt/src/node_tests/ndt_client.js
 
 if [ -n "$1" ]; then
     HOST=$1
 else
-    echo -n "No host specified."
     exit $STATE_CRITICAL
+fi
+
+# If the $CACHE_DIR doesn't exist create it.
+if [[ ! -d $CACHE_DIR ]]; then
+    mkdir $CACHE_DIR
+fi
+
+CACHE_STATUS=$(cat $CACHE_DIR/$HOST 2> /dev/null)
+
+# If the cached status for this $HOST is a successful result and the mtime of
+# the cache file is less than $MAX_CACHE_AGE, then return $STATE_OK.
+if [[ -n "$CACHE_STATUS" ]] && [[ "$CACHE_STATUS" -eq "$STATE_OK" ]]; then
+    file_age=$(expr $(date +%s) - $(stat --printf "%Y" $CACHE_DIR/$HOST))
+    if [[ "$file_age" -lt $MAX_CACHE_AGE ]]; then
+        exit $STATE_OK
+    fi
 fi
 
 # If there is no traffic shaping rule in place for this IP address, then refuse
@@ -23,16 +48,24 @@ fi
 IP_ADDR=$(dig $HOST +short)
 HEX_IP=$(printf '%02x' ${IP_ADDR//./ })
 if ! /sbin/tc filter show dev eth0 | grep -q $HEX_IP; then
-    echo -n "No tc filter for this host. Refusing to run."
+    echo $STATE_UNKNOWN > $CACHE_DIR/$HOST
     exit $STATE_UNKNOWN
 fi
 
-OUTPUT=$(nodejs $NDT_JS --quiet --server $HOST)
+# Do a queueing check first.
+OUTPUT=$(nodejs $NDT_JS --quiet --queueingtest --server $HOST)
+STATUS=$?
 
-if [ "$?" -eq "0" ]; then
-    echo -n "NDT E2E test succeeded."
+# If the server isn't queueing, then run the e2e test.
+if [[ "$STATUS" -ne "$STATE_QUEUEING" ]]; then
+    OUTPUT=$(nodejs $NDT_JS --quiet --server $HOST)
+    STATUS=$?
+fi
+
+echo $STATUS > $CACHE_DIR/$HOST
+
+if [ "$STATUS" -eq "0" ]; then
     exit $STATE_OK
 else
-    echo -n "$OUTPUT"
     exit $STATE_CRITICAL
 fi
