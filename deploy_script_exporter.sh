@@ -26,7 +26,7 @@ GCE_IMG_FAMILY="coreos-stable"
 # instance machine types to account for expected load.
 case $PROJECT in
   mlab-oti)
-    MACHINE_TYPE="n1-highmem-4"
+    MACHINE_TYPE="n1-standard-8"
     ;;
   mlab-staging)
     MACHINE_TYPE="n1-standard-2"
