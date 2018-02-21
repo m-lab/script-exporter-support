@@ -36,11 +36,17 @@ CACHE_STATUS=$(cat $CACHE_DIR/$HOST 2> /dev/null)
 
 # If the cached status for this $HOST is a successful result and the mtime of
 # the cache file is less than $MAX_CACHE_AGE, then return $STATE_OK.
-if [[ -n "$CACHE_STATUS" ]] && [[ "$CACHE_STATUS" -eq "$STATE_OK" ]]; then
-    file_age=$(expr $(date +%s) - $(stat --printf "%Y" $CACHE_DIR/$HOST))
-    if [[ "$file_age" -lt $MAX_CACHE_AGE ]]; then
-        exit $STATE_OK
+if [[ -n "$CACHE_STATUS" ]]; then
+    if [[ "$CACHE_STATUS" -eq "$STATE_OK" ]]; then
+        file_age=$(expr $(date +%s) - $(stat --printf "%Y" $CACHE_DIR/$HOST))
+        if [[ "$file_age" -lt $MAX_CACHE_AGE ]]; then
+            exit $STATE_OK
+        fi
     fi
+else
+    # The cache file didn't already exist, so this must be the first run of the
+    # e2e test for this node. Flag this for later use.
+    FIRST_RUN=true
 fi
 
 # If there is no traffic shaping rule in place for this IP address, then refuse
@@ -63,6 +69,18 @@ if [[ "$STATUS" -ne "$STATE_QUEUEING" ]]; then
 fi
 
 echo $STATUS > $CACHE_DIR/$HOST
+
+# If the cache file didn't previously exist, then this is the first run against
+# this sliver. In order to help spread out the cache expiration, and hence
+# spread out the NDT e2e tests, set the cache file's mtime from 1 second to
+# $MAX_CACHE_AGE seconds into the past, randomly. This means that the second
+# e2e test will run sooner than normal, but will hopefully cause the cached
+# statuses to expire at randomly different times and spread the NDT e2e test
+# load across the entire expiration interval.
+if [[ $FIRST_RUN ]]; then
+    RAND=$(shuf -i 1-$MAX_CACHE_AGE -n 1)
+    touch --date "${RAND} seconds ago" $CACHE_DIR/$HOST
+fi
 
 if [ "$STATUS" -eq "0" ]; then
     exit $STATE_OK
