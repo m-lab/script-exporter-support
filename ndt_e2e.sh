@@ -19,6 +19,11 @@ STATE_CRITICAL=2
 STATE_UNKNOWN=3
 STATE_QUEUEING=5
 
+# Flags whether this is the first time an e2e test has been run against this
+# node since this VM has been running. See comment later in this script to
+# understand why this variable exists.
+FIRST_RUN=false
+
 NDT_JS=/opt/mlab/ndt/src/node_tests/ndt_client.js
 
 if [ -n "$1" ]; then
@@ -78,7 +83,7 @@ echo $STATUS > $CACHE_DIR/$HOST
 # statuses to expire at randomly different times and spread the NDT e2e test
 # load across the entire expiration interval.
 if [[ $FIRST_RUN ]]; then
-    RAND=$(shuf -i 1-$MAX_CACHE_AGE -n 1)
+    RAND=$(($RANDOM % $MAX_CACHE_AGE))
     touch --date "${RAND} seconds ago" $CACHE_DIR/$HOST
 fi
 
