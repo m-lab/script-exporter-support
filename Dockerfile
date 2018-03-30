@@ -22,6 +22,6 @@ COPY apply_tc_rules.cron /etc/cron.daily/apply_tc_rules
 COPY ndt_e2e.sh /bin/ndt_e2e.sh
 COPY script_exporter.yml /etc/script_exporter/config.yml
 
-# Launch script_exporter, first running apply_tc_rules.sh
+# First start cron, then run apply_tc_rules.sh, then script_exporter.
 EXPOSE 9172
-ENTRYPOINT /bin/apply_tc_rules.sh && /root/go/bin/script_exporter -config.file=/etc/script_exporter/config.yml
+ENTRYPOINT service cron start && bin/apply_tc_rules.sh && /root/go/bin/script_exporter -config.file=/etc/script_exporter/config.yml
