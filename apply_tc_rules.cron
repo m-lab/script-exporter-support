@@ -1,5 +1,3 @@
-# Applies tc traffic limiting/filtering rules for the ndt_e2e.sh test.
+#!/bin/sh
 
-MAILTO=root
-
-@daily root /bin/apply_tc_rules.sh
+/bin/apply_tc_rules.sh
