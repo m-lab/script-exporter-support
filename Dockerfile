@@ -18,7 +18,7 @@ RUN GOPATH=/root/go go get github.com/m-lab/script_exporter
 
 # Copy scripts and configs
 COPY apply_tc_rules.sh /bin/apply_tc_rules.sh
-COPY apply_tc_rules.cron /etc/cron.daily/
+COPY apply_tc_rules.cron /etc/cron.daily/apply_tc_rules
 COPY ndt_e2e.sh /bin/ndt_e2e.sh
 COPY script_exporter.yml /etc/script_exporter/config.yml
 
