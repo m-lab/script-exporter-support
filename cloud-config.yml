@@ -2,6 +2,8 @@
 
 coreos:
   units:
+    - name: docker.service
+      command: start
     - name: apply-tc-rules.service
       content: |
         [Unit]
