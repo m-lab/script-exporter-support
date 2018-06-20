@@ -71,12 +71,17 @@ fi
 # static external IP address for the project.
 gcloud compute instances create $GCE_NAME --address $GCE_IP_NAME \
   --image-project $GCE_IMG_PROJECT --image-family $GCE_IMG_FAMILY \
-  --tags script-exporter --metadata-from-file user-data=cloud-config.yml \
+  --tags $GCE_NAME --metadata-from-file user-data=cloud-config.yml \
   --machine-type $MACHINE_TYPE
 
 # Give the GCE instance another 30s to fully become available. From time to time
 # the Travis-CI build fails because it can't connect via SSH.
 sleep 30
+
+# Get the internal VPC IP of the new instance.
+INTERNAL_IP=$(gcloud compute instances list \
+  --format="value(networkInterfaces[0].networkIP)" \
+  --filter="name=${GCE_NAME}")
 
 # Copy required snmp_exporter files to the GCE instance.
 gcloud compute scp $SCP_FILES $GCE_NAME:~
@@ -85,7 +90,7 @@ gcloud compute scp $SCP_FILES $GCE_NAME:~
 gcloud compute ssh $GCE_NAME --command "docker build -t ${IMAGE_TAG} ."
 
 # Start a new container based on the new/updated image.
-gcloud compute ssh $GCE_NAME --command "docker run --detach --restart always --publish 9172:9172 --name ${GCE_NAME} --cap-add NET_ADMIN ${IMAGE_TAG}"
+gcloud compute ssh $GCE_NAME --command "docker run --detach --restart always --publish ${INTERNAL_IP}:9172:9172 --name ${GCE_NAME} --cap-add NET_ADMIN ${IMAGE_TAG}"
 
 # Run Prometheus node_exporter in a container so we can gather VM metrics.
-gcloud compute ssh $GCE_NAME --command "docker run --detach --restart always --publish 9100:9100 --volume /proc:/host/proc --volume /sys:/host/sys prom/node-exporter --path.procfs /host/proc --path.sysfs /host/sys --no-collector.arp --no-collector.bcache --no-collector.conntrack --no-collector.edac --no-collector.entropy --no-collector.filefd --no-collector.hwmon --no-collector.infiniband --no-collector.ipvs --no-collector.mdadm --no-collector.netstat --no-collector.sockstat --no-collector.time --no-collector.timex --no-collector.uname --no-collector.vmstat --no-collector.wifi --no-collector.xfs --no-collector.zfs"
+gcloud compute ssh $GCE_NAME --command "docker run --detach --restart always --publish ${INTERNAL_IP}:9100:9100 --name node-exporter --volume /proc:/host/proc --volume /sys:/host/sys prom/node-exporter --path.procfs /host/proc --path.sysfs /host/sys --no-collector.arp --no-collector.bcache --no-collector.conntrack --no-collector.edac --no-collector.entropy --no-collector.filefd --no-collector.hwmon --no-collector.infiniband --no-collector.ipvs --no-collector.mdadm --no-collector.netstat --no-collector.sockstat --no-collector.time --no-collector.timex --no-collector.uname --no-collector.vmstat --no-collector.wifi --no-collector.xfs --no-collector.zfs"
