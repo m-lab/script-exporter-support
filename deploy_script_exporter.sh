@@ -29,7 +29,7 @@ case $PROJECT in
     MACHINE_TYPE="n1-standard-8"
     ;;
   mlab-staging)
-    MACHINE_TYPE="n1-standard-2"
+    MACHINE_TYPE="n1-standard-8"
     ;;
   *)
     MACHINE_TYPE="n1-standard-1"
