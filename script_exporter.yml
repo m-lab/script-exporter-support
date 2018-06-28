@@ -7,5 +7,5 @@ scripts:
     script: >
       NODE_PATH=/usr/lib/node_modules
       nodejs /opt/mlab/ndt/src/node_tests/ndt_client.js --queueingtest
-      --server ${TARGET}
+      --server ${TARGET} --protocol wss --port 3010
     timeout: 15
