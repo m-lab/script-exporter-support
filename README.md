@@ -1,1 +1,1 @@
-# prometheus-script-exporter
+# script-exporter-support
