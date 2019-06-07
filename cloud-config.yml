@@ -5,6 +5,7 @@ coreos:
     - name: docker.service
       command: start
     - name: apply-tc-rules.service
+      command: start
       content: |
         [Unit]
         Description=Updates tc traffic shaping rules in the script-exporter container.
