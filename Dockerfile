@@ -1,7 +1,7 @@
 FROM golang:1.11-stretch
 
 # Install necessary packages
-RUN apt-get update -qq && apt-get install -qq apt-transport-https curl dnsutils git gnupg golang jq iproute2 python sudo
+RUN apt-get update -qq && apt-get install -qq apt-transport-https dnsutils golang jq sudo
 
 # Setup Node.js repository, install nodejs, and any needed modules
 RUN curl -s https://deb.nodesource.com/gpgkey/nodesource.gpg.key | apt-key add -
