@@ -1,12 +1,12 @@
-FROM debian:stretch-slim
+FROM golang:1.11-stretch
 
 # Install necessary packages
-RUN apt-get update -qq && apt-get install -qq apt-transport-https curl dnsutils git gnupg golang jq iproute2 python sudo
+RUN apt update -qq && apt install -qq apt-transport-https curl dnsutils git gnupg golang jq iproute2 python sudo
 
 # Setup Node.js repository, install nodejs, and any needed modules
 RUN curl -s https://deb.nodesource.com/gpgkey/nodesource.gpg.key | apt-key add -
 RUN echo "deb https://deb.nodesource.com/node_0.12 jessie main" > /etc/apt/sources.list.d/nodesource.list
-RUN apt-get update -qq && apt-get install -qq nodejs=0.12.18-1nodesource1~jessie1
+RUN apt update -qq && apt install -qq nodejs=0.12.18-1nodesource1~jessie1
 RUN npm install --global --quiet minimist@1.2.0 ws@1.0.1
 
 # Clone necessary git repos
