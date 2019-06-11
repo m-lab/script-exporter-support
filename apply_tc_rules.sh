@@ -1,10 +1,14 @@
 #!/bin/bash
 
-MLABCONFIG=/opt/mlab/operator/plsync/mlabconfig.py
+# Fetch siteinfo sites.json and extract all NDT IPs.
+NDT_IPS=$(curl https://siteinfo.mlab-oti.measurementlab.net/v1/sites/sites.json | \
+    jq -r '.[] | .nodes[] | .experiments[] | select(.index == 2) | .v4.ip')
 
-if [ ! -x "$MLABCONFIG" ]; then
-    echo "Could not find mlabconfig.py or is it not executable. Exiting."
-    exit 1
+# If fetching sites.json or parsing it produces an error or a null list of IPs,
+# then exit now.
+if [[ "$?" -ne "0" ]] || [[ -z "${NDT_IPS}" ]]; then
+  echo "Failed to extract NDT IPs from SITES_JSON."
+  exit 1
 fi
 
 #
@@ -27,21 +31,16 @@ tc qdisc add dev eth0 handle ffff: ingress
 tc class add dev eth0 parent 1: classid 1:1 htb rate 1000mbit
 tc class add dev eth0 parent 1: classid 1:10 htb rate 5mbit
 	
-# Extract NDT sliver IPs from mlabconfig.py output
-NDT_IPS=$($MLABCONFIG --format=hostips | egrep '^ndt\.iupui')
-
 #
 # Configure filters
 #
-# Add filters for each NDT IP address. egress traffic mathing a destination IP
-# address of an NDT sliver gets queued into class id 1:10.  ingress traffic
+# Add filters for each NDT IP address. egress traffic matching a destination IP
+# address of an NDT expierment gets queued into class id 1:10.  ingress traffic
 # with a source IP matching one of the NDT slivers gets policed at 50Kbps.
 
-for sliver in $NDT_IPS; do
-    SLIVER_IP=$(echo $sliver | cut -d',' -f 2)    
-    echo $SLIVER_IP
+for ip in $NDT_IPS; do
     tc filter add dev eth0 parent 1: protocol ip prio 1 \
-        u32 match ip dst $SLIVER_IP flowid 1:10
+        u32 match ip dst ${ip} flowid 1:10
     tc filter add dev eth0 parent ffff: protocol ip prio 1 \
-        u32 match ip src $SLIVER_IP police rate 50kbps burst 10k drop
+        u32 match ip src ${ip} police rate 50kbps burst 10k drop
 done
