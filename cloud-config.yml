@@ -19,7 +19,7 @@ coreos:
         Description=Run apply-tc-rules.service daily.
 
         [Timer]
-        OnCalendar=daily
+        OnCalendar=Mon..Fri 15:00:00
 
         [Install]
         WantedBy=multi-user.target
