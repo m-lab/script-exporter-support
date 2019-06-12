@@ -13,34 +13,19 @@ if [[ "$?" -ne "0" ]] || [[ -z "${NDT_IPS}" ]]; then
   exit 1
 fi
 
-# Be sure that at least a reasonable number of IPs were discovered in
-# hostnames.json. For example, at the time of this comment there are 528 NDT
-# IPv4 addresses. This just ensures that a truncated or misconfigured file
-# doesn't cause a majority of NDT servers to get marked as offline.
-if [[ "$( echo $NDT_IPS | wc -w)" -lt 400 ]] ; then
-  echo "Not enough NDT IPs were discovered in hostnames.json. Exiting."
-  exit 1
-fi
-
-#
-# First, erase all existing configurations.
-#
-tc qdisc del dev eth0 root || true
-tc qdisc del dev eth0 ingress || true
-
 #
 # Add root queues.
 #
-tc qdisc add dev eth0 root handle 1: htb default 1
-tc qdisc add dev eth0 handle ffff: ingress
+tc qdisc add dev eth0 root handle 1: htb default 1 || :
+tc qdisc add dev eth0 handle ffff: ingress || :
 
 #
 # Configure classes. Default class egress queue gets 1Gbps, while slowed-down
-# classes get only 1Mbps, which should hopefully be a sufficient pipe for any
+# classes get only 5Mbps, which should hopefully be a sufficient pipe for any
 # concurrent NDT E2E tests that may happen.
 # 
-tc class add dev eth0 parent 1: classid 1:1 htb rate 1000mbit
-tc class add dev eth0 parent 1: classid 1:10 htb rate 5mbit
+tc class add dev eth0 parent 1: classid 1:1 htb rate 1000mbit || :
+tc class add dev eth0 parent 1: classid 1:10 htb rate 5mbit || :
 
 #
 # Configure filters
@@ -50,8 +35,15 @@ tc class add dev eth0 parent 1: classid 1:10 htb rate 5mbit
 # with a source IP matching one of the NDT slivers gets policed at 50Kbps.
 
 for ip in $NDT_IPS; do
+  HEX_IP=$(printf '%02x' ${ip//./ })
+  # Only add the egress filter for this IP if it doesn't already exist.
+  if ! tc filter show dev eth0 parent 1: | grep "${HEX_IP}"; then
     tc filter add dev eth0 parent 1: protocol ip prio 1 \
         u32 match ip dst ${ip} flowid 1:10
+  fi
+  # Only add the ingress filter for this IP if it doesn't already exist.
+  if ! tc filter show dev eth0 parent ffff: | grep "${HEX_IP}"; then
     tc filter add dev eth0 parent ffff: protocol ip prio 1 \
         u32 match ip src ${ip} police rate 50kbps burst 10k drop
+  fi
 done
