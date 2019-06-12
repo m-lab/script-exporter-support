@@ -1,47 +1,51 @@
 #!/bin/bash
 
-MLABCONFIG=/opt/mlab/operator/plsync/mlabconfig.py
+set -euo pipefail
 
-if [ ! -x "$MLABCONFIG" ]; then
-    echo "Could not find mlabconfig.py or is it not executable. Exiting."
-    exit 1
+# Fetch siteinfo hostnames.json and extract all NDT IPs.
+NDT_IPS=$(curl -s https://siteinfo.mlab-oti.measurementlab.net/v1/sites/hostnames.json | \
+    jq -r '.[] | select(.hostname | match("ndt.iupui.*")) | .ipv4')
+
+# If fetching hostnames.json or parsing it produces an error or a null list of
+# IPs, then exit now.
+if [[ "$?" -ne "0" ]] || [[ -z "${NDT_IPS}" ]]; then
+  echo "Failed to extract NDT IPs from hostnames.json."
+  exit 1
 fi
-
-#
-# First, erase all existing configurations.
-#
-tc qdisc del dev eth0 root
-tc qdisc del dev eth0 ingress 
 
 #
 # Add root queues.
 #
-tc qdisc add dev eth0 root handle 1: htb default 1
-tc qdisc add dev eth0 handle ffff: ingress
+tc qdisc add dev eth0 root handle 1: htb default 1 || :
+tc qdisc add dev eth0 handle ffff: ingress || :
 
 #
 # Configure classes. Default class egress queue gets 1Gbps, while slowed-down
-# classes get only 1Mbps, which should hopefully be a sufficient pipe for any
+# classes get only 5Mbps, which should hopefully be a sufficient pipe for any
 # concurrent NDT E2E tests that may happen.
 # 
-tc class add dev eth0 parent 1: classid 1:1 htb rate 1000mbit
-tc class add dev eth0 parent 1: classid 1:10 htb rate 5mbit
-	
-# Extract NDT sliver IPs from mlabconfig.py output
-NDT_IPS=$($MLABCONFIG --format=hostips | egrep '^ndt\.iupui')
+tc class add dev eth0 parent 1: classid 1:1 htb rate 1000mbit || :
+tc class add dev eth0 parent 1: classid 1:10 htb rate 5mbit || :
 
 #
 # Configure filters
 #
-# Add filters for each NDT IP address. egress traffic mathing a destination IP
-# address of an NDT sliver gets queued into class id 1:10.  ingress traffic
+# Add filters for each NDT IP address. egress traffic matching a destination IP
+# address of an NDT experiment gets queued into class id 1:10.  ingress traffic
 # with a source IP matching one of the NDT slivers gets policed at 50Kbps.
+egress_filters=$(tc filter show dev eth0 parent 1:)
+ingress_filters=$(tc filter show dev eth0 parent ffff:)
 
-for sliver in $NDT_IPS; do
-    SLIVER_IP=$(echo $sliver | cut -d',' -f 2)    
-    echo $SLIVER_IP
+for ip in $NDT_IPS; do
+  HEX_IP=$(printf '%02x' ${ip//./ })
+  # Only add the egress filter for this IP if it doesn't already exist.
+  if ! echo "${egress_filters}" | grep "${HEX_IP}" > /dev/null; then
     tc filter add dev eth0 parent 1: protocol ip prio 1 \
-        u32 match ip dst $SLIVER_IP flowid 1:10
+        u32 match ip dst ${ip} flowid 1:10
+  fi
+  # Only add the ingress filter for this IP if it doesn't already exist.
+  if ! echo "${ingress_filters}" | grep "${HEX_IP}" > /dev/null; then
     tc filter add dev eth0 parent ffff: protocol ip prio 1 \
-        u32 match ip src $SLIVER_IP police rate 50kbps burst 10k drop
+        u32 match ip src ${ip} police rate 50kbps burst 10k drop
+  fi
 done
