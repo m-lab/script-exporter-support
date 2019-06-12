@@ -11,7 +11,7 @@ coreos:
 
         [Service]
         Type=oneshot
-        ExecStart=/bin/docker exec script-exporter bash -c '/bin/apply_tc_rules.sh'
+        ExecStart=/bin/docker exec script-exporter /bin/apply_tc_rules.sh
     - name: apply-tc-rules.timer
       command: "start"
       content: |
