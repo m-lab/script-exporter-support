@@ -39,12 +39,12 @@ ingress_filters=$(tc filter show dev eth0 parent ffff:)
 for ip in $NDT_IPS; do
   HEX_IP=$(printf '%02x' ${ip//./ })
   # Only add the egress filter for this IP if it doesn't already exist.
-  if ! echo "${egress_filters}" | grep "${HEX_IP}"; then
+  if ! echo "${egress_filters}" | grep "${HEX_IP}" > /dev/null; then
     tc filter add dev eth0 parent 1: protocol ip prio 1 \
         u32 match ip dst ${ip} flowid 1:10
   fi
   # Only add the ingress filter for this IP if it doesn't already exist.
-  if ! echo "${ingress_filters}" | grep "${HEX_IP}"; then
+  if ! echo "${ingress_filters}" | grep "${HEX_IP}" > /dev/null; then
     tc filter add dev eth0 parent ffff: protocol ip prio 1 \
         u32 match ip src ${ip} police rate 50kbps burst 10k drop
   fi
