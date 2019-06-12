@@ -1,13 +1,24 @@
 #!/bin/bash
 
-# Fetch siteinfo sites.json and extract all NDT IPs.
-NDT_IPS=$(curl https://siteinfo.mlab-oti.measurementlab.net/v1/sites/sites.json | \
-    jq -r '.[] | .nodes[] | .experiments[] | select(.index == 2) | .v4.ip')
+set -euo pipefail
 
-# If fetching sites.json or parsing it produces an error or a null list of IPs,
-# then exit now.
+# Fetch siteinfo hostnames.json and extract all NDT IPs.
+NDT_IPS=$(curl -s https://siteinfo.mlab-oti.measurementlab.net/v1/sites/hostnames.json | \
+    jq -r '.[] | select(.hostname | match("ndt.iupui.*")) | .ipv4')
+
+# If fetching hostnames.json or parsing it produces an error or a null list of
+# IPs, then exit now.
 if [[ "$?" -ne "0" ]] || [[ -z "${NDT_IPS}" ]]; then
-  echo "Failed to extract NDT IPs from SITES_JSON."
+  echo "Failed to extract NDT IPs from hostnames.json."
+  exit 1
+fi
+
+# Be sure that at least a reasonable number of IPs were discovered in
+# hostnames.json. For example, at the time of this comment there are 528 NDT
+# IPv4 addresses. This just ensures that a truncated or misconfigured file
+# doesn't cause a majority of NDT servers to get marked as offline.
+if [[ "$( echo $NDT_IPS | wc -w)" -lt 400 ]] ; then
+  echo "Not enough NDT IPs were discovered in hostnames.json. Exiting."
   exit 1
 fi
 
@@ -30,12 +41,12 @@ tc qdisc add dev eth0 handle ffff: ingress
 # 
 tc class add dev eth0 parent 1: classid 1:1 htb rate 1000mbit
 tc class add dev eth0 parent 1: classid 1:10 htb rate 5mbit
-	
+
 #
 # Configure filters
 #
 # Add filters for each NDT IP address. egress traffic matching a destination IP
-# address of an NDT expierment gets queued into class id 1:10.  ingress traffic
+# address of an NDT experiment gets queued into class id 1:10.  ingress traffic
 # with a source IP matching one of the NDT slivers gets policed at 50Kbps.
 
 for ip in $NDT_IPS; do
