@@ -25,8 +25,8 @@ fi
 #
 # First, erase all existing configurations.
 #
-tc qdisc del dev eth0 root
-tc qdisc del dev eth0 ingress 
+tc qdisc del dev eth0 root || true
+tc qdisc del dev eth0 ingress || true
 
 #
 # Add root queues.
