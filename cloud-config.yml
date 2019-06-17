@@ -36,11 +36,10 @@ coreos:
 
         [Service]
         Type=oneshot
-        ExecStart=/bin/docker exec script-exporter bash -c 'git -C /opt/mlab/operator pull && /bin/apply_tc_rules.sh'
+        ExecStart=/bin/docker exec script-exporter /bin/apply_tc_rules.sh
 
         [Install]
         WantedBy=multi-user.target
-
     - name: apply-tc-rules.timer
       command: "start"
       content: |
@@ -48,7 +47,7 @@ coreos:
         Description=Run apply-tc-rules.service daily.
 
         [Timer]
-        OnCalendar=daily
+        OnCalendar=Mon..Fri 15:00:00
 
         [Install]
         WantedBy=multi-user.target
