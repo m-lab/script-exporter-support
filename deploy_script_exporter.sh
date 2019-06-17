@@ -94,3 +94,7 @@ gcloud compute ssh $GCE_NAME --command "docker run --detach --restart always --p
 
 # Run Prometheus node_exporter in a container so we can gather VM metrics.
 gcloud compute ssh $GCE_NAME --command "docker run --detach --restart always --publish ${INTERNAL_IP}:9100:9100 --name node-exporter --volume /proc:/host/proc --volume /sys:/host/sys prom/node-exporter --path.procfs /host/proc --path.sysfs /host/sys --no-collector.arp --no-collector.bcache --no-collector.conntrack --no-collector.edac --no-collector.entropy --no-collector.filefd --no-collector.hwmon --no-collector.infiniband --no-collector.ipvs --no-collector.mdadm --no-collector.netstat --no-collector.sockstat --no-collector.time --no-collector.timex --no-collector.uname --no-collector.vmstat --no-collector.wifi --no-collector.xfs --no-collector.zfs"
+
+# Enable docker.script-exporter.service so that script-exporter restarts after
+# a reboot.
+gcloud compute ssh $GCE_NAME --command "systemctl enable script-exporter"

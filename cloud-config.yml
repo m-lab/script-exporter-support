@@ -4,6 +4,29 @@ coreos:
   units:
     - name: docker.service
       command: start
+    # Make sure the script-exporter container starts after the Docker daemon.
+    # This is initially not enabled, to avoid conflicts with the Travis
+    # deployment. After the script-exporter image has been pulled and run once,
+    # this service is enabled to make sure script-exporter is restarted after
+    # a reboot.
+    - name: script-exporter.service
+      content: |
+        [Unit]
+        Description=script-exporter Docker container
+        After=docker.service
+        Requires=docker.service
+
+        [Service]
+        TimeoutStartSec=0
+        Restart=always
+        ExecStartPre=-/usr/bin/docker stop ${GCE_NAME}
+        ExecStartPre=-/usr/bin/docker rm ${GCE_NAME}
+        ExecStart=docker run --detach --restart always
+          --publish ${INTERNAL_IP}:9172:9172 --name ${GCE_NAME}
+          --cap-add NET_ADMIN ${IMAGE_TAG}
+
+        [Install]
+        WantedBy=multi-user.target
     - name: apply-tc-rules.service
       command: start
       content: |
@@ -46,4 +69,3 @@ write_files:
       PasswordAuthentication no
       ChallengeResponseAuthentication no
       PermitRootLogin no
-
