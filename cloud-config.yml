@@ -9,6 +9,8 @@ coreos:
       content: |
         [Unit]
         Description=Updates tc traffic shaping rules in the script-exporter container.
+        After=docker.service
+        Requires=docker.service
 
         [Service]
         Type=oneshot
