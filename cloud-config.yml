@@ -28,12 +28,11 @@ coreos:
         [Install]
         WantedBy=multi-user.target
     - name: apply-tc-rules.service
-      command: start
       content: |
         [Unit]
         Description=Updates tc traffic shaping rules in the script-exporter container.
-        After=docker.service
-        Requires=docker.service
+        After=script-exporter.service
+        Requires=script-exporter.service
 
         [Service]
         Type=oneshot
