@@ -4,8 +4,11 @@ scripts:
     timeout: 45
 
   - name: 'ndt_queue'
+    # NOTE: we specify "--tests 16" to request a STATUS test, which is a
+    # "no-op" request to the server that also does not register as upload or
+    # downloads errors on the server.
     script: >
       NODE_PATH=/usr/lib/node_modules
       nodejs /opt/mlab/ndt/src/node_tests/ndt_client.js --queueingtest
-      --server ${TARGET} --protocol wss --port 3010
+      --server ${TARGET} --protocol wss --port 3010 --tests 16
     timeout: 15
