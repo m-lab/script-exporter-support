@@ -65,7 +65,7 @@ fi
 
 # Do a queueing check first.
 OUTPUT=$(nodejs $NDT_JS --quiet --queueingtest --server $HOST --protocol wss \
-  --port 3010)
+  --port 3010 --tests 16 )
 STATUS=$?
 
 # If the server isn't queueing, then run the e2e test.
