@@ -83,7 +83,7 @@ echo $STATUS > $CACHE_DIR/$HOST
 # e2e test will run sooner than normal, but will hopefully cause the cached
 # statuses to expire at randomly different times and spread the NDT e2e test
 # load across the entire expiration interval.
-if [[ $FIRST_RUN ]]; then
+if [[ $FIRST_RUN = "true" ]]; then
     RAND=$(($RANDOM % $MAX_CACHE_AGE))
     touch --date "${RAND} seconds ago" $CACHE_DIR/$HOST
 fi
