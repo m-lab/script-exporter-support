@@ -24,7 +24,7 @@ set -u
 # command again.
 MAX_CACHE_AGE=${1:?Please provide timeout value}
 
-# Where to store cached NDT e2e test results
+# Where to store cached exit codes from the given command.
 CACHE_DIR=/tmp/cache-${2:?Please provide a command to run}
 
 # Flags whether this is the first time an e2e test has been run against this
