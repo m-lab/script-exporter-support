@@ -28,4 +28,5 @@ deploy:
     skip_cleanup: true
     on:
       repo: m-lab/script-exporter-support
-      tags: true
+      all_branches: true
+      condition: $TRAVIS_TAG == production*
