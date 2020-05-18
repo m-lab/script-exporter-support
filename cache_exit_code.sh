@@ -27,11 +27,6 @@ MAX_CACHE_AGE=${1:?Please provide timeout value}
 # Where to store cached exit codes from the given command.
 CACHE_DIR=/tmp/cache-${2:?Please provide a command to run}
 
-# Flags whether this is the first time an e2e test has been run against this
-# node since this VM has been running. See comment later in this script to
-# understand why this variable exists.
-RANDOMIZE_TIMESTAMP=false
-
 # If the $CACHE_DIR doesn't exist create it.
 if [[ ! -d $CACHE_DIR ]]; then
     mkdir -p $CACHE_DIR
@@ -48,10 +43,6 @@ if [[ -n "$CACHE_STATUS" ]]; then
             exit $STATE_OK
         fi
     fi
-else
-    # The cache file didn't already exist, so this must be the first run of the
-    # e2e test for this node. Flag this for later use.
-    RANDOMIZE_TIMESTAMP=true
 fi
 
 shift 1  # Remove first parameter.
@@ -62,16 +53,13 @@ STATUS=$?
 # Cache result.
 echo $STATUS > $CACHE_DIR/$TARGET
 
-# If the cache file didn't previously exist, then this is the first run. To
-# help distribute the cache expiration randomly (and the command execution), we
-# set the cache file's mtime from 1 second to $MAX_CACHE_AGE seconds into the
-# past, randomly. This means that the second command will run sooner, but it
-# will also cause the cached statuses to expire at random times, distributing
-# the command execution times.
-if [[ $RANDOMIZE_TIMESTAMP = "true" ]]; then
-    RAND=$(($RANDOM % $MAX_CACHE_AGE))
-    touch --date "${RAND} seconds ago" $CACHE_DIR/$TARGET
-fi
+# To help distribute the cache expiration randomly (and the command execution),
+# we unconditionally set the cache file's mtime from 1 second to $MAX_CACHE_AGE
+# seconds into the past. This means that the next command will run sooner,
+# but it will also cause the cached statuses to expire at random times,
+# distributing the command execution times uniformly.
+RAND=$(($RANDOM % $MAX_CACHE_AGE))
+touch --date "${RAND} seconds ago" $CACHE_DIR/$TARGET
 
 if [ "$STATUS" -eq "0" ]; then
     exit $STATE_OK
