@@ -1,9 +1,14 @@
-FROM golang:1.13-stretch
+FROM golang:1.15-buster
 
 # Install script_exporter and dependencies.
 RUN go get github.com/m-lab/script_exporter
 RUN go get github.com/m-lab/ndt5-client-go/cmd/ndt5-client
 RUN go get github.com/m-lab/locate/cmd/monitoring-token
+
+# Install java for the wehe cli client, and clone client repo
+RUN apt update && apt install --yes openjdk-11-jre-headless
+RUN git clone https://github.com/dng24/wehe-cmdline
+
 COPY ./cache_exit_code.sh /usr/bin/
 
 EXPOSE 9172
