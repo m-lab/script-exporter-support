@@ -12,6 +12,21 @@ if [[ -z "$TARGET" ]] ; then
     exit $STATE_CRITICAL
 fi
 
+if [[ -z "$EXPERIMENT" ]] ; then
+    echo 'ERROR: must define EXPERIMENT from environment'
+    exit $STATE_CRITICAL
+fi
+
+if [[ -z ${1} ]]; then
+    echo "ERROR: missing TTL for command (arg 1)"
+    exit $STATE_CRITICAL
+fi
+
+if [[ -z ${2} ]]; then
+    echo "ERROR: missing command to run (arg 2)"
+    exit $STATE_CRITICAL
+fi
+
 if [[ -n "$LOGX_DEBUG" ]] ; then
     # Enable additional execution logs for debugging.
     set -x
@@ -22,10 +37,10 @@ set -u
 
 # Max age (in seconds) to use a cached command result before running the
 # command again.
-MAX_CACHE_AGE=${1:?Please provide timeout value}
+MAX_CACHE_AGE=${1}
 
 # Where to store cached exit codes from the given command.
-CACHE_DIR=/tmp/cache-${2:?Please provide a command to run}
+CACHE_DIR=/tmp/cache-${EXPERIMENT}
 
 # If the $CACHE_DIR doesn't exist create it.
 if [[ ! -d $CACHE_DIR ]]; then
