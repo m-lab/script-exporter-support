@@ -9,3 +9,6 @@
 
 java -jar wehe-cmdline/wehe-cmdline.jar -m $MONITORING_URL $@
 
+# Remove any log files written by the test.
+rm -rf ./test_results
+
