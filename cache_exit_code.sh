@@ -27,10 +27,10 @@ if [[ -z ${2} ]]; then
     exit $STATE_CRITICAL
 fi
 
-if [[ -n "$LOGX_DEBUG" ]] ; then
+if [[ "$LOGX_DEBUG" == "true" ]] ; then
     # Enable additional execution logs for debugging.
     set -x
-    exec 1>> /tmp/${TARGET}.log 2>&1
+    exec 1> /tmp/${TARGET}.log 2>&1
 fi
 
 set -u
