@@ -1,9 +1,9 @@
-FROM golang:1.15-buster
+FROM golang:1.18
 
 # Install script_exporter and dependencies.
-RUN go get github.com/m-lab/script_exporter
-RUN go get github.com/m-lab/ndt5-client-go/cmd/ndt5-client
-RUN go get github.com/m-lab/locate/cmd/monitoring-token
+RUN go install github.com/m-lab/script_exporter@v1.2.0
+RUN go install github.com/m-lab/ndt5-client-go/cmd/ndt5-client@v0.1.0
+RUN go install github.com/m-lab/locate/cmd/monitoring-token@v0.14.10
 
 # Install java for the wehe cli client, and clone client repo
 # Install tini: https://github.com/krallin/tini
