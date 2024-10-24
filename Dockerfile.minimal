@@ -8,7 +8,7 @@ RUN go install github.com/m-lab/locate/cmd/monitoring-token@v0.14.10
 
 # Install java for the wehe cli client, and clone client repo
 # Install tini: https://github.com/krallin/tini
-RUN apt update && apt install --yes openjdk-11-jre-headless tini
+RUN apt update && apt install --yes openjdk-17-jre-headless tini
 RUN git clone https://github.com/NEU-SNS/wehe-cmdline
 
 COPY ./cache_exit_code.sh ./wehe-client.sh /usr/bin/
